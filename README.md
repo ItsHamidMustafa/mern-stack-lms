@@ -127,3 +127,7 @@ For the backend:
    ```bash
    cd ../frontend
    npm install
+
+## CONTRIBUTION
+
+You want to contribute? click that fork button and let's be friends :)
