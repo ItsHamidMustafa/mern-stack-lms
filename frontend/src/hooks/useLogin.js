@@ -5,53 +5,54 @@ export const useLogin = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(null);
     const { dispatch } = useAuthContext();
+    let instname = process.env.REACT_APP_INST_NAME.toLowerCase()
 
-    // const checkUser  = (email) => {
-    //     const studentRegex = /^\d{4}f-institutename-\d{4}$/;
-    //     if (studentRegex.test(email)) {
-    //         return 'student';
-    //     }
-
-
-    //     const teacherRegex = /^[a-zA-Z]+\.[a-zA-Z]+@example\.com$/;
-    //     if (teacherRegex.test(email)) {
-    //         return 'teacher';
-    //     }
+    const checkUser  = (email) => {
+        const studentRegex = new RegExp(`^\\d{4}([sf])-${instname}-\\d{4}$`);
+        if (studentRegex.test(email)) {
+            return 'student';
+        }
 
 
-    //     const adminRegex = /^hello\.admin@example\.com$/;
-    //     if (adminRegex.test(email)) {
-    //         return 'admin';
-    //     }
+        const teacherRegex = /^[a-zA-Z]+\.[a-zA-Z]$/;
+        if (teacherRegex.test(email)) {
+            return 'teacher';
+        }
 
-    //     return null;
-    // };
+
+        const adminRegex = /^[a-zA-Z]+\.admin$/;
+        if (adminRegex.test(email)) {
+            return 'admin';
+        }
+
+        return null;
+    };
 
     const login = async (email, password) => {
         setIsLoading(true);
         setError(null);
 
-        // const userType = checkUser (email);
-        // let apiEndpoint;
+        const userType = checkUser (email);
+        let apiEndpoint;
 
 
-        // switch (userType) {
-        //     case 'student':
-        //         apiEndpoint = '/api/students/login';
-        //         break;
-        //     case 'teacher':
-        //         apiEndpoint = '/api/teachers/login';
-        //         break;
-        //     case 'admin':
-        //         apiEndpoint = '/api/admins/login';
-        //         break;
-        //     default:
-        //         setIsLoading(false);
-        //         setError('Invalid email format');
-        //         return;
-        // }
+        switch (userType) {
+            case 'student':
+                apiEndpoint = '/api/students/login';
+                break;
+            case 'teacher':
+                apiEndpoint = '/api/teachers/login';
+                break;
+            case 'admin':
+                apiEndpoint = '/api/admins/login';
+                break;
+            default:
+                setIsLoading(false);
+                setError('Invalid email format');
+                return;
+        }
 
-        const response = await fetch('/api/students/login', {
+        const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })

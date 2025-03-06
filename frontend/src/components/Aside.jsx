@@ -46,7 +46,7 @@ export const Aside = () => {
       <div className="aside-bg"></div>
       <div className="aside">
         <Link to="/" className="aside-logo">
-          SiC
+          {process.env.REACT_APP_INST_NAME}
         </Link>
         <div className="aside-center-align aside-links-container">
           <Link className={location.pathname === "/" ? "active" : ""} to="/">

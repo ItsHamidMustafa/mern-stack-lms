@@ -239,15 +239,16 @@ studentSchema.statics.signup = async function (studentData) {
   };
 };
 
-studentSchema.statics.login = async function (email, password) {
-  if (!email || !password) {
+studentSchema.statics.login = async function (regno, password) {
+  console.log(regno)
+  if (!regno || !password) {
     throw Error("All fields must be filled!");
   }
 
-  const student = await this.findOne({ email });
+  const student = await this.findOne({ regno });
 
   if (!student) {
-    throw Error("We cannot find a student with that email!");
+    throw Error("We cannot find a student with that registration number!");
   }
 
   const match = await bcrypt.compare(password, student.password);

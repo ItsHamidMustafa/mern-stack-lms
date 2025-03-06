@@ -11,6 +11,16 @@ const getRegno = async () => {
   const instituteCode = instituteName.slice(0, 3).toLowerCase();
   const d = new Date();
   const year = d.getFullYear();
+  const month = d.getMonth()
+
+  let semesterLetter;
+  if (month >= 0 && month <= 4) {
+    semesterLetter = 's';
+  } else if (month >= 7 && month <= 11) {
+    semesterLetter = 'f';
+  } else {
+    semesterLetter = 'summer-session';
+  }
 
   try {
     const lastStudent = await Student.findOne().sort({ _id: -1 });
@@ -18,7 +28,7 @@ const getRegno = async () => {
       ? parseInt(lastStudent.regno.split("-").pop())
       : 0;
     const newRegNum = lastRegNum + 1;
-    const regno = `${year}-${instituteCode}-${newRegNum.toString().padStart(4, "0")}`;
+    const regno = `${year}${semesterLetter}-${instituteCode}-${newRegNum.toString().padStart(4, "0")}`;
     return regno;
   } catch (err) {
     return err;
@@ -69,7 +79,6 @@ const loginStudent = async (req, res) => {
 const signupStudent = async (req, res) => {
   try {
     const regno = await getRegno();
-    console.log(regno, typeof regno);
     const student = await Student.signup({ regno, ...req.body });
     const token = createToken(student._id);
     res.status(200).json({ ...student, token });

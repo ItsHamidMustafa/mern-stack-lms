@@ -38,7 +38,7 @@ function Login() {
                     <input
                         autoComplete="email"
                         id="login-email"
-                        type="email"
+                        type="text"
                         onChange={(e) => { setEmail(e.target.value) }}
                         value={email}
                         required
