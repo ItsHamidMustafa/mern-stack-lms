@@ -240,7 +240,6 @@ studentSchema.statics.signup = async function (studentData) {
 };
 
 studentSchema.statics.login = async function (regno, password) {
-  console.log(regno)
   if (!regno || !password) {
     throw Error("All fields must be filled!");
   }

@@ -1,5 +1,17 @@
 const Teacher = require('../models/Teacher');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+
+const createToken = (_id) => {
+  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
+};
+
+const getRegno = async (firstName, lastName, subject) => {
+    const lowerFirstName = firstName.toLowerCase().replace(/\s+/g, '');
+    const lowerLastName = lastName.toLowerCase().replace(/\s+/g, '');
+    const lowerSubject = subject.toLowerCase().replace(/\s+/g, '');
+    return `${lowerFirstName}${lowerLastName}.${lowerSubject.substring(0, 2)}`;
+};
 
 const fetchAll = async (req, res) => {
     const teacher = await Teacher.find().sort({ created_at: -1 });
@@ -20,10 +32,10 @@ const fetchOne = async (req, res) => {
 }
 
 const loginTeacher = async (req, res) => {
-    const { email, password } = req.body;
+    const { regno, password } = req.body;
 
     try {
-        const teacher = await Teacher.login(email, password);
+        const teacher = await Teacher.login(regno, password);
         const token = createToken(teacher._id);
         res.status(200).json({ ...teacher._doc, token });
     } catch (error) {
@@ -33,7 +45,8 @@ const loginTeacher = async (req, res) => {
 
 const signupTeacher = async (req, res) => {
     try {
-        const teacher = await Teacher.signup({ ...req.body, role: "teacher" });
+        const regno = await getRegno(req.body.firstName, req.body.lastName, req.body.subject);
+        const teacher = await Teacher.signup({ ...req.body, role: "teacher", regno });
         const token = createToken(teacher._id);
         res.status(200).json({ ...teacher, token });
     } catch (error) {
@@ -42,14 +55,8 @@ const signupTeacher = async (req, res) => {
 };
 
 const createTeacher = async (req, res) => {
-    const { name, dob, fatherName, gender } = req.body;
-
-    if (!name || !dob || !fatherName || !gender) {
-        res.status(400).json({ error: 'All fields must be filled!' });
-    }
-
     try {
-        const teacher = await Teacher.create({ name, dob, fatherName, gender });
+        const teacher = await Teacher.signup({ firstName, lastName, dob, fatherName, gender, subject, email, password, regno, cnic, contactNum });
         res.status(200).json(teacher);
     } catch (err) {
         res.status(400).json({ msg: 'We got an error', err });
@@ -98,6 +105,20 @@ const deleteTeacher = async (req, res) => {
     }
 }
 
+const fetchCurrentTeacher = async (req, res) => {
+  try {
+    const teacher = await Teacher.findById(req.teacher._id).select("-password");
+
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found!" });
+    }
+
+    return res.json(teacher);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve teacher!" });
+  }
+};
+
 module.exports = {
     signupTeacher,
     loginTeacher,
@@ -105,5 +126,6 @@ module.exports = {
     fetchAll,
     createTeacher,
     updateTeacher,
-    deleteTeacher
+    deleteTeacher,
+    fetchCurrentTeacher
 };

@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const checkRole = require('../middlewares/checkRole');
 const auth = require('../middlewares/requireAuth');
-const { signupTeacher, loginTeacher, createTeacher, updateTeacher, deleteTeacher, fetchAll } = require('../controllers/teacherController');
+const { signupTeacher, loginTeacher, createTeacher, updateTeacher, deleteTeacher, fetchAll, fetchCurrentTeacher } = require('../controllers/teacherController');
 
 router.get('/fetch', auth, fetchAll);
+router.get('/me', auth, fetchCurrentTeacher);
 router.post('/create', createTeacher);
 router.post('/signup', signupTeacher);
 router.post('/login', loginTeacher);
