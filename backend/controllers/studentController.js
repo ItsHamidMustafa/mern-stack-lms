@@ -2,8 +2,8 @@ const Student = require("../models/Student");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
+const createToken = (_id, role) => {
+  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
 };
 
 const getRegno = async () => {
@@ -35,41 +35,41 @@ const getRegno = async () => {
   }
 };
 
-const fetchCurrentStudent = async (req, res) => {
-  try {
-    const student = await Student.findById(req.student._id).select("-password");
+// const fetchCurrentStudent = async (req, res) => {
+//   try {
+//     const student = await Student.findById(req.student._id).select("-password");
 
-    if (!student) {
-      return res.status(404).json({ error: "Student not found!" });
-    }
+//     if (!student) {
+//       return res.status(404).json({ error: "Student not found!" });
+//     }
 
-    res.json({
-      _id: student._id,
-      firstName: student.firstName,
-      lastName: student.lastName,
-      dateOfBirth: student.dateOfBirth,
-      gender: student.gender,
-      semester: student.semester,
-      nationality: student.nationality,
-      contactNumber: student.contactNumber,
-      email: student.email,
-      currentStatus: student.currentStatus,
-      gradeLevel: student.gradeLevel,
-      major: student.major,
-      coursesEnrolled: student.coursesEnrolled,
-      advisor: student.advisor,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve student!" });
-  }
-};
+//     res.json({
+//       _id: student._id,
+//       firstName: student.firstName,
+//       lastName: student.lastName,
+//       dateOfBirth: student.dateOfBirth,
+//       gender: student.gender,
+//       semester: student.semester,
+//       nationality: student.nationality,
+//       contactNumber: student.contactNumber,
+//       email: student.email,
+//       currentStatus: student.currentStatus,
+//       gradeLevel: student.gradeLevel,
+//       major: student.major,
+//       coursesEnrolled: student.coursesEnrolled,
+//       advisor: student.advisor,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to retrieve student!" });
+//   }
+// };
 
 const loginStudent = async (req, res) => {
-  const { email, password } = req.body;
+  const { regno, password } = req.body;
 
   try {
-    const student = await Student.login(email, password);
-    const token = createToken(student._id);
+    const student = await Student.login(regno, password);
+    const token = createToken(student._id, student.role);
     res.status(200).json({ ...student._doc, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -80,7 +80,7 @@ const signupStudent = async (req, res) => {
   try {
     const regno = await getRegno();
     const student = await Student.signup({ regno, ...req.body });
-    const token = createToken(student._id);
+    const token = createToken(student._id, student.role);
     res.status(200).json({ ...student, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -254,5 +254,4 @@ module.exports = {
   deleteStudent,
   loginStudent,
   signupStudent,
-  fetchCurrentStudent,
 };

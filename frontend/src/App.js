@@ -18,22 +18,22 @@ import { Help } from "./pages/Help";
 import { Error } from "./pages/Error";
 
 function App() {
-  const { student } = useAuthContext();
+  const { user } = useAuthContext();
   return (
     <div className="app">
       <BrowserRouter>
-        {student && <Aside />}
+        {user && <Aside />}
         <div className="main-container">
           <Navbar />
           <Routes>
-            <Route path="/" element={student ? <Home /> : <Login />} />
+            <Route path="/" element={user ? <Home /> : <Login />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route
               path="/profile"
               element={
-                student ? (
-                  <Profile student={student} />
+                user ? (
+                  <Profile user={user} />
                 ) : (
                   <Navigate to="/login" />
                 )
@@ -41,35 +41,35 @@ function App() {
             />
             <Route
               path="/signup"
-              element={!student ? <Signup /> : <Navigate to="/" />}
+              element={!user ? <Signup /> : <Navigate to="/" />}
             />
             <Route
               path="/login"
-              element={!student ? <Login /> : <Navigate to="/" />}
+              element={!user ? <Login /> : <Navigate to="/" />}
             />
             <Route
               path="/courses"
-              element={student ? <CoursesPage /> : <Navigate to="/login" />}
+              element={user ? <CoursesPage /> : <Navigate to="/login" />}
             />
             <Route
               path="/schedule"
-              element={student ? <Schedule /> : <Navigate to="/login" />}
+              element={user ? <Schedule /> : <Navigate to="/login" />}
             />
             <Route
               path="/assignments"
-              element={student ? <Assignments /> : <Navigate to="/login" />}
+              element={user ? <Assignments /> : <Navigate to="/login" />}
             />
             <Route
               path="/analytics"
-              element={student ? <Analytics /> : <Navigate to="/login" />}
+              element={user ? <Analytics /> : <Navigate to="/login" />}
             />
             <Route
               path="/messages"
-              element={student ? <Messages /> : <Navigate to="/login" />}
+              element={user ? <Messages /> : <Navigate to="/login" />}
             />
             <Route
               path="/settings"
-              element={student ? <Settings /> : <Navigate to="/login" />}
+              element={user ? <Settings /> : <Navigate to="/login" />}
             />
             <Route path="/help" element={<Help />} />
             <Route path="*" element={<Error />} />

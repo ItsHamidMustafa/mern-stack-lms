@@ -107,4 +107,4 @@ teacherSchema.statics.login = async function (regno, password) {
     return teacher;
 };
 
-module.exports = mongoose.model('teachers', teacherSchema);
+module.exports = mongoose.model('Teacher', teacherSchema);

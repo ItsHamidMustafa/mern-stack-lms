@@ -48,7 +48,7 @@ export const Courses = () => {
               <p>{course.description}</p>
               <p>
                 <span className="material-symbols-outlined">school</span>
-                Teacher: {course.teacher.name}
+                Teacher: {course.teacher.firstName + " " + course.teacher.lastName}
               </p>
           </div>
         ))

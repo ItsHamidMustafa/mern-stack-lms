@@ -13,19 +13,19 @@ const requireAuth = async (req, res, next) => {
     const token = authorization.split(' ')[1];
 
     try {
-        const { _id, role } = jwt.verify(token, process.env.SECRET);
+        const decoded = jwt.verify(token, process.env.SECRET);
+        if (!decoded) return res.status(401).json({ message: "Invalid token" });
         let user;
-        switch (role) {
+        switch (decoded.role) {
             case 'student':
-                user = await Student.findById(_id).select('_id role');
+                user = await Student.findById(decoded._id);
                 break;
             case 'teacher':
-                user = await Teacher.findById(_id).select('_id role');
-                console.log(user);
+                user = await Teacher.findById(decoded._id);
                 break;
-            // case 'admin':
-            //     user = await Admin.findById(_id).select('_id role');
-            //     break;
+            case 'admin':
+                user = await Admin.findById(decoded._id);
+                break;
             default:
                 return res.status(401).json({ error: 'Invalid user role!' });
         }
@@ -33,8 +33,6 @@ const requireAuth = async (req, res, next) => {
         if (!user) {
             return res.status(401).json({ error: `${role.charAt(0).toUpperCase() + role.slice(1)} not found!` });
         }
-
-        // Attach user to request object
         req.user = user;
         next();
     } catch (error) {

@@ -12,7 +12,7 @@ const {
 
 router.get("/fetch", auth, fetchAllCourses);
 router.get("/fetch/:id", fetchOneCourse);
-router.post("/create", auth, isAdmin, createCourse);
+router.post("/create", auth, createCourse);
 router.patch("/update/:id", auth, isAdmin, updateCourse);
 router.delete("/delete/:id", auth, isAdmin, deleteCourse);
 

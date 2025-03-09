@@ -3,7 +3,7 @@ const Student = require("../models/Student");
 const mongoose = require("mongoose");
 
 const fetchClass = async (req, res) => {
-  const { _id } = req.student;
+  const { _id } = req.user;
   const { batch, className, semester } = await Student.findById(_id);
   const classRes = await Class.find({
     name: className,
@@ -11,7 +11,7 @@ const fetchClass = async (req, res) => {
     semester,
   }).populate({
     path: "schedule.lectures.teacherId",
-    model: "teachers",
+    model: "Teacher",
   });
 
   if (!classRes) {

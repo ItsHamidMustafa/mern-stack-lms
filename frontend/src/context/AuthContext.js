@@ -5,9 +5,9 @@ export const AuthContext = createContext();
 export const authReducer = (state, action) => {
     switch (action.type) {
         case 'LOGIN':
-            return { student: action.payload }
+            return { user: action.payload.user };
         case 'LOGOUT':
-            return { student: null };
+            return { user: null };
         default:
             return state;
     }
@@ -15,30 +15,37 @@ export const authReducer = (state, action) => {
 
 export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, {
-        student: null
+        student: null,
     });
 
-    const fetchStudent = async (token) => {
-        const response = await fetch('/api/students/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`
+    const fetchUser = async (token) => {
+
+        try {
+            const response = await fetch('/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const user = await response.json();
+
+            if (response.ok) {
+                dispatch({ type: 'LOGIN', payload: user });
+            } else {
+                console.error('Error fetching user: ', user.error);
             }
-        });
 
-        const student = await response.json();
-
-        if (response.ok) {
-            dispatch({ type: 'LOGIN', payload: student });
-        } else {
-            console.error('Error fetching student: ', student.error);
+        } catch (error) {
+            console.error("Network error: ", error);
+            dispatch({ type: "LOGOUT" })
         }
     };
 
+
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem('token'));
-        const role = JSON.parse(localStorage.getItem('role'));
         if (token) {
-            fetchStudent(token);
+            fetchUser(token);
         }
     }, []);
 

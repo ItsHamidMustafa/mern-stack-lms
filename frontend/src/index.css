@@ -186,7 +186,7 @@ nav {
 
 .schedule-card {
     flex-direction: column;
-    flex-basis: 300px;
+    flex-basis: 350px;
     flex-grow: 1;
     background: var(--primary-light);
     border-radius: 15px;

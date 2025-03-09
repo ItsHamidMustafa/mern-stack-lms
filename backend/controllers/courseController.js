@@ -4,14 +4,14 @@ const mongoose = require("mongoose");
 
 const fetchAllCourses = async (req, res) => {
   try {
-    const studentId = req.student._id;
+    const studentId = req.user._id;
     const student =
       await Student.findById(studentId).populate({
         path: "coursesEnrolled",
         model: "courses",
         populate: {
           path: "teacher",
-          model: "teachers"
+          model: "Teacher"
         }
       });
     if (!student) {
@@ -31,7 +31,7 @@ const fetchOneCourse = async (req, res) => {
     return res.status(400).json({ error: "Could not find that Course!" });
   }
 
-  const Course = await Course.findById(id).populate("teacher");
+  const Course = await Course.findById(id).populate("Teacher");
 
   if (!Course) {
     return res.status(200).json({ msg: "This Course is not available!" });
@@ -44,47 +44,43 @@ const createCourse = async (req, res) => {
   const {
     title,
     description,
-    category,
-    level,
+    classId,
+    slug,
+    code,
     teacher,
-    modules,
-    duration,
-    language,
-    tags,
+    isPublished,
     thumbnail,
     introVideoUrl,
-    completionCertificate,
+    enrollmentCount,
   } = req.body;
 
-  if (!mongoose.Types.ObjectId.isValid(category)) {
-    res.status(400).json({
-      error: "Invalid category, check if that category already exists!",
-    });
-    return;
-  }
-
   try {
-    const Course = await Course.create({
+    // Validate classId and teacher ID
+    if (!mongoose.Types.ObjectId.isValid(classId)) {
+      return res.status(400).json({ error: "Invalid class ID." });
+    }
+    if (!mongoose.Types.ObjectId.isValid(teacher)) {
+      return res.status(400).json({ error: "Invalid teacher ID." });
+    }
+
+    // Create the course
+    const newCourse = new Course({
       title,
       description,
-      category,
-      level,
+      classId,
+      slug,
+      code,
       teacher,
-      modules,
-      duration,
-      language,
-      tags,
+      isPublished,
       thumbnail,
       introVideoUrl,
-      completionCertificate,
+      enrollmentCount,
     });
 
-    res.status(200).json(Course);
-    return;
-  } catch (err) {
-    res
-      .status(401)
-      .json({ error: "Error creating Course, double check all the inputs!" });
+    await newCourse.save();
+    res.status(201).json({ message: "Course created successfully", newCourse });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error", details: error });
   }
 };
 

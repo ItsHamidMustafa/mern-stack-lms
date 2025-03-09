@@ -90,7 +90,7 @@ export const Schedule = () => {
                   </p>
                   <p>
                     <span className="material-symbols-outlined">school</span>
-                    Teacher: {lecture.teacherId?.name || "Unknown"}
+                    Teacher: {lecture.teacherId?.firstName + " " + lecture.teacherId?.lastName || "Unknown"}
                   </p>
                   <p>
                     <span className="material-symbols-outlined">door_back</span>

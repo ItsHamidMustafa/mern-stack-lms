@@ -10,19 +10,19 @@ export const useLogin = () => {
     const checkUser = (regno) => {
         const studentRegex = new RegExp(`^\\d{4}([sf])-${instname}-\\d{4}$`);
         if (studentRegex.test(regno)) {
-            console.log('student true')
+            console.log('is student [true]')
             return 'student';
         }
 
         const adminRegex = /^[a-zA-Z]+\.admin$/;
         if (adminRegex.test(regno)) {
-            console.log('admin true')
+            console.log('is admin [true]')
             return 'admin';
         }
 
         const teacherRegex = /^[a-zA-Z]+\.[a-zA-Z]+$/;
         if (teacherRegex.test(regno)) {
-            console.log('teacher true')
+            console.log('is teacher [true]')
             return 'teacher';
         }
 
@@ -59,44 +59,13 @@ export const useLogin = () => {
         });
 
         const json = await response.json();
-        console.log(json);
 
         if (!response.ok) {
             setIsLoading(false);
             setError(json.error);
         } else {
             localStorage.setItem('token', JSON.stringify(json.token));
-
-
-            // let userEndpoint;
-            // switch (userType) {
-            //     case 'student':
-            //         userEndpoint = '/api/students/me';
-            //         break;
-            //     case 'teacher':
-            //         userEndpoint = '/api/teachers/me';
-            //         break;
-            //     case 'admin':
-            //         userEndpoint = '/api/admins/me';
-            //         break;
-            //     default:
-            //         setIsLoading(false);
-            //         setError('Invalid user type!');
-            //         return;
-            // }
-            // console.log(json.token);
-            // const userResponse = await fetch(userEndpoint, {
-            //     headers: { 'Authorization': `Bearer ${json.token}` }
-            // });
-
-            // const user = await userResponse.json();
-
-            // if (userResponse.ok) {
-            //     dispatch({ type: 'LOGIN', payload: user });
-            // } else {
-            //     setError(user.error);
-            // }
-            dispatch ({ type: 'LOGIN', payload: json});
+            dispatch ({ type: 'LOGIN', payload: { user: json }});
             setIsLoading(false);
         }
     };

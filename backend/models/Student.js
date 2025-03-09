@@ -59,6 +59,7 @@ const studentSchema = new mongoose.Schema(
     },
     classId: {
       type: mongoose.Types.ObjectId,
+      ref: "Class",
       required: false,
     },
     gender: {

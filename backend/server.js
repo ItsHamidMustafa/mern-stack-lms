@@ -8,6 +8,7 @@ const studentRoutes = require("./routes/student");
 // const scheduleRoutes = require("./routes/schedule");
 const classRoutes = require("./routes/class");
 const helpRoutes = require("./routes/help");
+const authRoutes = require("./routes/authRoutes");
 
 app.use(express.json());
 
@@ -22,6 +23,7 @@ app.use("/api/students", studentRoutes);
 // app.use("/api/schedule", scheduleRoutes);
 app.use("/api/class", classRoutes);
 app.use("/api/help", helpRoutes);
+app.use("/api/auth", authRoutes);
 
 mongoose
   .connect(process.env.MONG_URI, {

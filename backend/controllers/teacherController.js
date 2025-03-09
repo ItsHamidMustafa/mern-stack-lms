@@ -2,8 +2,8 @@ const Teacher = require('../models/Teacher');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
+const createToken = (_id, role) => {
+  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
 };
 
 const getRegno = async (firstName, lastName, subject) => {
@@ -19,7 +19,7 @@ const fetchAll = async (req, res) => {
         return res.status(200).json({ msg: "No teacher found!" });
     }
 
-    return res.status(200).json(categories);
+    return res.status(200).json(teacher);
 }
 
 const fetchOne = async (req, res) => {
@@ -36,7 +36,7 @@ const loginTeacher = async (req, res) => {
 
     try {
         const teacher = await Teacher.login(regno, password);
-        const token = createToken(teacher._id);
+        const token = createToken(teacher._id, teacher.role);
         res.status(200).json({ ...teacher._doc, token });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -47,7 +47,7 @@ const signupTeacher = async (req, res) => {
     try {
         const regno = await getRegno(req.body.firstName, req.body.lastName, req.body.subject);
         const teacher = await Teacher.signup({ ...req.body, role: "teacher", regno });
-        const token = createToken(teacher._id);
+        const token = createToken(teacher._id, teacher.role);
         res.status(200).json({ ...teacher, token });
     } catch (error) {
         res.status(400).json({ error: error.message });

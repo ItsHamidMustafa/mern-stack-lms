@@ -10,11 +10,10 @@ const {
   fetchAll,
   loginStudent,
   signupStudent,
-  fetchCurrentStudent,
 } = require("../controllers/studentController");
 
 router.get("/fetch", auth, fetchAll);
-router.get("/me", auth, fetchCurrentStudent);
+// router.get("/me", auth, fetchCurrentStudent);
 router.get("/fetch/:id", auth, fetchOneStudent);
 router.post("/create", createStudent);
 router.post("/login", loginStudent);
