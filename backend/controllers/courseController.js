@@ -5,24 +5,44 @@ const mongoose = require("mongoose");
 const fetchAllCourses = async (req, res) => {
   try {
     const studentId = req.user._id;
-    const student =
-      await Student.findById(studentId).populate({
+    const student = await Student.findById(studentId)
+      .populate({
         path: "coursesEnrolled",
         model: "courses",
         populate: {
           path: "teacher",
-          model: "Teacher"
+          model: "Teacher",
+          select: "firstName lastName regno"
         }
       });
+
     if (!student) {
       return res.status(404).json({ error: "Student not found!" });
     }
 
-    return res.status(200).json(student.coursesEnrolled);
+    const formattedCourses = student.coursesEnrolled.map(course => ({
+      _id: course._id,
+      title: course.title,
+      description: course.description,
+      code: course.code,
+      thumbnail: course.thumbnail,
+      introVideoUrl: course.introVideoUrl,
+      teacher: course.teacher
+        ? {
+            firstName: course.teacher.firstName,
+            lastName: course.teacher.lastName,
+            email: course.teacher.email,
+            role: course.teacher.role
+          }
+        : null
+    }));
+
+    return res.status(200).json(formattedCourses);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
 };
+
 
 const fetchOneCourse = async (req, res) => {
   const { id } = req.params;

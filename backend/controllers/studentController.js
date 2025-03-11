@@ -70,7 +70,13 @@ const loginStudent = async (req, res) => {
   try {
     const student = await Student.login(regno, password);
     const token = createToken(student._id, student.role);
-    res.status(200).json({ ...student._doc, token });
+    res.status(200).json({
+      _id: student._id,
+      firstName: student.firstName,
+      role: student.role,
+      token
+    });
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

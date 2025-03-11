@@ -19,9 +19,19 @@ const requireAuth = async (req, res, next) => {
         switch (decoded.role) {
             case 'student':
                 user = await Student.findById(decoded._id);
+                user = {
+                    _id: user._id,
+                    firstName: user.firstName,
+                    role: user.role,
+                }
                 break;
-            case 'teacher':
-                user = await Teacher.findById(decoded._id);
+                case 'teacher':
+                    user = await Teacher.findById(decoded._id);
+                    user = {
+                        _id: user._id,
+                        firstName: user.firstName,
+                        role: user.role
+                    }
                 break;
             case 'admin':
                 user = await Admin.findById(decoded._id);

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
 const createToken = (_id, role) => {
-  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
+    return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
 };
 
 const getRegno = async (firstName, lastName, subject) => {
@@ -37,7 +37,12 @@ const loginTeacher = async (req, res) => {
     try {
         const teacher = await Teacher.login(regno, password);
         const token = createToken(teacher._id, teacher.role);
-        res.status(200).json({ ...teacher._doc, token });
+        res.status(200).json({
+            _id: teacher._id,
+            firstName: teacher.firstName,
+            role: teacher.role,
+            token
+        });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -106,17 +111,17 @@ const deleteTeacher = async (req, res) => {
 }
 
 const fetchCurrentTeacher = async (req, res) => {
-  try {
-    const teacher = await Teacher.findById(req.teacher._id).select("-password");
+    try {
+        const teacher = await Teacher.findById(req.teacher._id).select("-password");
 
-    if (!teacher) {
-      return res.status(404).json({ error: "Teacher not found!" });
+        if (!teacher) {
+            return res.status(404).json({ error: "Teacher not found!" });
+        }
+
+        return res.json(teacher);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to retrieve teacher!" });
     }
-
-    return res.json(teacher);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve teacher!" });
-  }
 };
 
 module.exports = {
