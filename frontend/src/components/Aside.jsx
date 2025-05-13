@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 export const Aside = () => {
   const [mode, setMode] = useState("dark");
+  const { user, loading } = useAuthContext();
 
   useEffect(() => {
     const savedMode = localStorage.getItem("mode") || "dark";
@@ -74,13 +76,23 @@ export const Aside = () => {
             <span className="material-symbols-outlined">monitoring</span>
             Analytics
           </Link>
-          <Link
-            className={location.pathname === "/assignments" ? "active" : ""}
-            to="/assignments"
-          >
-            <span className="material-symbols-outlined">assignment</span>
-            Assignments
-          </Link>
+          {!loading && user?.role !== 'admin' ?
+            <Link
+              className={location.pathname === "/assignments" ? "active" : ""}
+              to="/assignments"
+            >
+              <span className="material-symbols-outlined">assignment</span>
+              Assignments
+            </Link>
+            :
+            <Link
+              className={location.pathname === "/teachers" ? "active" : ""}
+              to="/teachers"
+            >
+              <span className="material-symbols-outlined">school</span>
+              Teachers
+            </Link>
+          }
           <Link
             className={location.pathname === "/messages" ? "active" : ""}
             to="/messages"
@@ -89,11 +101,11 @@ export const Aside = () => {
             Messages
           </Link>
           <Link
-            className={location.pathname === "/settings" ? "active" : ""}
-            to="/settings"
+            className={location.pathname === "/profile" ? "active" : ""}
+            to="/profile"
           >
-            <span className="material-symbols-outlined">tune</span>
-            Settings
+            <span className="material-symbols-outlined">account_circle</span>
+            Profile
           </Link>
           <Link
             className={location.pathname === "/help" ? "active" : ""}

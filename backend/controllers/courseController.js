@@ -12,7 +12,7 @@ const fetchAllCourses = async (req, res) => {
         populate: {
           path: "teacher",
           model: "Teacher",
-          select: "firstName lastName regno"
+          select: "firstName lastName regno _id"
         }
       });
 
@@ -29,11 +29,11 @@ const fetchAllCourses = async (req, res) => {
       introVideoUrl: course.introVideoUrl,
       teacher: course.teacher
         ? {
-            firstName: course.teacher.firstName,
-            lastName: course.teacher.lastName,
-            email: course.teacher.email,
-            role: course.teacher.role
-          }
+          firstName: course.teacher.firstName,
+          lastName: course.teacher.lastName,
+          email: course.teacher.email,
+          role: course.teacher.role
+        }
         : null
     }));
 
@@ -81,6 +81,12 @@ const createCourse = async (req, res) => {
     }
     if (!mongoose.Types.ObjectId.isValid(teacher)) {
       return res.status(400).json({ error: "Invalid teacher ID." });
+    }
+
+    // unique slug check
+    const existingSlug = await Course.findOne({ slug });
+    if (existingSlug) {
+      return res.status(400).json({ error: "Course slug must be unique." });
     }
 
     // Create the course

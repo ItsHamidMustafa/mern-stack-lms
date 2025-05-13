@@ -10,19 +10,16 @@ export const useLogin = () => {
     const checkUser = (regno) => {
         const studentRegex = new RegExp(`^\\d{4}([sf])-${instname}-\\d{4}$`);
         if (studentRegex.test(regno)) {
-            console.log('is student [true]')
             return 'student';
         }
 
         const adminRegex = /^[a-zA-Z]+\.admin$/;
         if (adminRegex.test(regno)) {
-            console.log('is admin [true]')
             return 'admin';
         }
 
         const teacherRegex = /^[a-zA-Z]+\.[a-zA-Z]+$/;
         if (teacherRegex.test(regno)) {
-            console.log('is teacher [true]')
             return 'teacher';
         }
 
@@ -45,6 +42,7 @@ export const useLogin = () => {
                 apiEndpoint = '/api/teachers/login';
                 break;
             case 'admin':
+                console.log('case admin true');
                 apiEndpoint = '/api/admins/login';
                 break;
             default:
@@ -65,7 +63,7 @@ export const useLogin = () => {
             setError(json.error);
         } else {
             localStorage.setItem('token', JSON.stringify(json.token));
-            dispatch ({ type: 'LOGIN', payload: { user: json }});
+            dispatch({ type: 'LOGIN', payload: json });
             setIsLoading(false);
         }
     };

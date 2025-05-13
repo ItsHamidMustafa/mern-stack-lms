@@ -4,10 +4,12 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import UserTray from './UserTray'
 
 export const Navbar = () => {
-    const { user } = useAuthContext();
-
+    const { user, loading } = useAuthContext();
     const location = useLocation();
 
+    if (loading) {
+        return <div>Loading...</div>
+    }
 
     return (
         <nav>

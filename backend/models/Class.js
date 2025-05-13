@@ -74,4 +74,10 @@ const classSchema = new mongoose.Schema({
   ],
 });
 
+classSchema.virtual("students", {
+  ref: "Student",
+  localField: "_id",
+  foreignField: "classId",
+});
+
 module.exports = mongoose.model("Class", classSchema);

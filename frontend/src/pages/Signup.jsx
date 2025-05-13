@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSignup } from "../hooks/useSignup";
 import { Link } from 'react-router-dom';
 import { CountryList } from "../components/CountryList";
 
 function Signup() {
     const [firstName, setFirstName] = useState('');
+    const [fatherName, setFatherName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -14,6 +15,8 @@ function Signup() {
     const [street, setStreet] = useState('');
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
+    const [programs, setPrograms] = useState([]);
+    const [selectedProgram, setSelectedProgram] = useState('');
     const [nationality, setNationality] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [postalCode, setPostalCode] = useState('');
@@ -24,6 +27,21 @@ function Signup() {
     const today = new Date();
     const fifteenYearsAgo = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
 
+    useEffect(() => {
+        const fetchPrograms = async () => {
+            try {
+                const response = await fetch('/api/programs/fetch-programs', {
+                    method: 'GET',
+                });
+                const data = await response.json()
+                setPrograms(data);
+            } catch (error) {
+                console.error("Failed to load programs: ", error);
+            }
+        }
+        fetchPrograms();
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -33,8 +51,7 @@ function Signup() {
             state: state,
             postalCode: postalCode,
         };
-
-        await signup(firstName, lastName, email, password, dateOfBirth, cnic, gender, address, nationality, contactNumber);
+        await signup(firstName, lastName, email, fatherName, password, dateOfBirth, cnic, contactNumber, gender, nationality, selectedProgram, address);
     }
 
     const handleNationalityChange = (selectedNationality) => {
@@ -55,6 +72,7 @@ function Signup() {
         <div className="login-container">
             <form className="login" onSubmit={handleSubmit}>
                 <h2>Sign up</h2>
+                <h3 className="col-white">Details</h3>
                 <div className="user-first-last-name-container">
                     <div>
                         <div className="input-box">
@@ -95,6 +113,19 @@ function Signup() {
                         required
                         placeholder="Enter your email"
                         autoComplete="email"
+                    />
+                </div>
+                <div className="input-box">
+                    <span className="material-symbols-outlined material-symbols-filled col-primary">
+                        person
+                    </span>
+                    <input
+                        id="signup-fatherName"
+                        type="text"
+                        onChange={(e) => { setFatherName(e.target.value) }}
+                        value={fatherName}
+                        required
+                        placeholder="Enter your father's name"
                     />
                 </div>
                 <div className="input-box">
@@ -181,9 +212,23 @@ function Signup() {
                     </span>
                     <CountryList onNationalityChange={handleNationalityChange} />
                 </div>
-                <h2>
+                <h3 className="col-white">
+                    PROGRAM
+                </h3>
+                <div className="input-box">
+                    <span className="material-symbols-outlined material-symbols-filled col-primary">menu_book</span>
+                    <select value={selectedProgram} onChange={(e) => setSelectedProgram(e.target.value)} required>
+                        <option value="">Select Program</option>
+                        {programs
+                            .map(prog => (
+                                <option key={prog._id} value={prog._id}>{prog.name}</option>
+                            ))}
+
+                    </select>
+                </div>
+                <h3 className="col-white">
                     ADDRESS
-                </h2>
+                </h3>
 
                 <div className="input-box">
                     <span className="material-symbols-outlined material-symbols-filled col-primary">

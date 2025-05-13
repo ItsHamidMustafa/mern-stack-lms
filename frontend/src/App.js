@@ -5,7 +5,6 @@ import Navbar from "./components/Navbar";
 import { Aside } from "./components/Aside";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import Profile from "./pages/Profile";
 import { CoursesPage } from "./pages/CoursesPage";
 import { About } from "./pages/About";
 import { Contact } from "./pages/Contact";
@@ -13,12 +12,19 @@ import { Schedule } from "./pages/Schedule";
 import { Assignments } from "./pages/Assignments";
 import { Analytics } from "./pages/Analytics";
 import { Messages } from "./pages/Messages";
-import { Settings } from "./pages/Settings";
+import { Profile } from "./pages/Profile";
 import { Help } from "./pages/Help";
 import { Error } from "./pages/Error";
+import { Teachers } from "./pages/Teachers";
+import { Teacher } from "./pages/Teacher";
 
 function App() {
-  const { user } = useAuthContext();
+  const { user, loading } = useAuthContext();
+
+  if (loading) {
+    return <div>Loading...</div>; // Show loading state while fetching user
+  }
+
   return (
     <div className="app">
       <BrowserRouter>
@@ -30,16 +36,6 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route
-              path="/profile"
-              element={
-                user ? (
-                  <Profile user={user} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route
               path="/signup"
               element={!user ? <Signup /> : <Navigate to="/" />}
             />
@@ -48,8 +44,7 @@ function App() {
               element={!user ? <Login /> : <Navigate to="/" />}
             />
             <Route
-              path="/courses"
-              element={user ? <CoursesPage /> : <Navigate to="/login" />}
+              path="/courses" element={user ? <CoursesPage /> : <Navigate to="/login" />}
             />
             <Route
               path="/schedule"
@@ -60,6 +55,14 @@ function App() {
               element={user ? <Assignments /> : <Navigate to="/login" />}
             />
             <Route
+              path="/teachers"
+              element={user?.role === 'admin' ? <Teachers /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/teacher/:id"
+              element={user?.role === 'admin' ? <Teacher /> : <Navigate to="/" />}
+            />
+            <Route
               path="/analytics"
               element={user ? <Analytics /> : <Navigate to="/login" />}
             />
@@ -68,8 +71,8 @@ function App() {
               element={user ? <Messages /> : <Navigate to="/login" />}
             />
             <Route
-              path="/settings"
-              element={user ? <Settings /> : <Navigate to="/login" />}
+              path="/profile"
+              element={user ? <Profile /> : <Navigate to="/login" />}
             />
             <Route path="/help" element={<Help />} />
             <Route path="*" element={<Error />} />

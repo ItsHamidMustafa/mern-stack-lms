@@ -44,9 +44,9 @@ const AvatarButtonTray = () => {
             isAnimating ? "tray-opening" : "tray-closing"
           }`}
         >
-          <Link className="tray-item" to="/settings">
-            <span className="material-symbols-outlined">settings</span>
-            Settings
+          <Link className="tray-item" to="/profile">
+            <span className="material-symbols-outlined">account_circle</span>
+            Profile
           </Link>
           <button
             className="tray-item"

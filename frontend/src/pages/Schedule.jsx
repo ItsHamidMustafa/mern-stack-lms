@@ -13,7 +13,7 @@ export const Schedule = () => {
       });
 
       if (!response.ok) {
-        console.log("Error fetching data");
+        console.error("Error fetching data");
         return;
       }
 
@@ -69,9 +69,9 @@ export const Schedule = () => {
           </button>
         </div>
         <div className="sub-component-container">
-          {schedule[0]?.schedule ? (
+          {schedule?.schedule ? (
             (() => {
-              const selectedDay = schedule[0]?.schedule.find(
+              const selectedDay = schedule?.schedule.find(
                 (dayItem) => dayItem.day === scheduleDay,
               );
 

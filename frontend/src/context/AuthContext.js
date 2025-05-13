@@ -5,9 +5,13 @@ export const AuthContext = createContext();
 export const authReducer = (state, action) => {
     switch (action.type) {
         case 'LOGIN':
-            return { user: action.payload.user };
+            return { user: action.payload, loading: false, error: null };
         case 'LOGOUT':
-            return { user: null };
+            return { user: null, loading: false, error: null };
+        case 'SET_LOADING':
+            return { ...state, loading: true };
+        case 'SET_ERROR':
+            return { user: null, loading: false, error: action.payload };
         default:
             return state;
     }
@@ -15,10 +19,13 @@ export const authReducer = (state, action) => {
 
 export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, {
-        student: null,
+        user: null,
+        loading: true, // Start with loading true
+        error: null,
     });
 
-    const fetchUser = async (token) => {
+    const fetchUser  = async (token) => {
+        dispatch({ type: 'SET_LOADING' }); // Set loading to true
 
         try {
             const response = await fetch('/api/auth/me', {
@@ -30,22 +37,24 @@ export const AuthContextProvider = ({ children }) => {
             const user = await response.json();
 
             if (response.ok) {
-                dispatch({ type: 'LOGIN', payload: user });
+                dispatch({ type: 'LOGIN', payload: user.user });
             } else {
+                dispatch({ type: 'SET_ERROR', payload: user.error });
                 console.error('Error fetching user: ', user.error);
             }
 
         } catch (error) {
             console.error("Network error: ", error);
-            dispatch({ type: "LOGOUT" })
+            dispatch({ type: "LOGOUT" });
         }
     };
-
 
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem('token'));
         if (token) {
-            fetchUser(token);
+            fetchUser (token);
+        } else {
+            dispatch({ type: 'LOGOUT' });
         }
     }, []);
 

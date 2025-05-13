@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
 const Schema = mongoose.Schema;
 
-const teacherSchema = new Schema({
+const adminSchema = new Schema({
     firstName: {
         type: String,
         required: true,
@@ -26,10 +26,6 @@ const teacherSchema = new Schema({
     gender: {
         type: String,
         enum: ['Male', 'Female', 'Other']
-    },
-    subject: {
-        type: String,
-        required: true
     },
     joinedAt: {
         type: Date,
@@ -63,13 +59,13 @@ const teacherSchema = new Schema({
     },
     role: {
         type: String,
-        default: "teacher",
+        default: "admin",
         required: true,
     }
 });
 
-teacherSchema.statics.signup = async function (teacherData) {
-    const { email, password, firstName, lastName, fatherName, dob, cnic, gender, contactNum } = teacherData;
+adminSchema.statics.signup = async function (adminData) {
+    const { email, password, firstName, lastName, fatherName, dob, cnic, gender, contactNum } = adminData;
     const exists = await this.findOne({ email });
     
     if (!email || !password) {
@@ -83,28 +79,28 @@ teacherSchema.statics.signup = async function (teacherData) {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
 
-    const teacher = await this.create({ ...teacherData, password: hash });
-    return teacher;
+    const admin = await this.create({ ...adminData, password: hash });
+    return admin;
 };
 
-teacherSchema.statics.login = async function (regno, password) {
+adminSchema.statics.login = async function (regno, password) {
     if (!regno || !password) {
         throw Error("All fields must be filled!");
     }
 
-    const teacher = await this.findOne({ regno });
+    const admin = await this.findOne({ regno });
 
-    if (!teacher) {
-        throw Error("We cannot find a teacher with that registration number!");
+    if (!admin) {
+        throw Error("We cannot find a admin with that registration number!");
     }
 
-    const match = await bcrypt.compare(password, teacher.password);
+    const match = await bcrypt.compare(password, admin.password);
 
     if (!match) {
         throw Error("Incorrect password, please try again!");
     }
 
-    return teacher;
+    return admin;
 };
 
-module.exports = mongoose.model('Teacher', teacherSchema);
+module.exports = mongoose.model('Admin', adminSchema);

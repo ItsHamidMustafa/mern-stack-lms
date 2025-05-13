@@ -1,4 +1,5 @@
 const Student = require("../models/Student");
+const Program = require('../models/Program');
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
@@ -85,13 +86,35 @@ const loginStudent = async (req, res) => {
 const signupStudent = async (req, res) => {
   try {
     const regno = await getRegno();
-    const student = await Student.signup({ regno, ...req.body });
+    const program = await Program.findById(req.body.selectedProgram).populate('departmentId');
+    console.log(req.body.selectedProgram)
+    if (!program) {
+      return res.status(404).json({ error: "Program not found." });
+    }
+    if (!program.departmentId) {
+      return res.status(404).json({ error: "Associated department not found." });
+    }
+    const studentData = {
+      ...req.body,
+      regno,
+      program: program._id,
+      department: program.departmentId,
+    };
+    const student = await Student.signup(studentData);
     const token = createToken(student._id, student.role);
-    res.status(200).json({ ...student, token });
+    res.status(200).json({
+      _id: student._id,
+      firstName: student.firstName,
+      role: student.role,
+      token,
+    });
+
   } catch (error) {
+    console.error("Signup Error:", error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const fetchAll = async (req, res) => {
   const student = await Student.find().sort({ created_at: -1 });
