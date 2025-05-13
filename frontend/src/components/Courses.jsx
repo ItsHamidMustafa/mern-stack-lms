@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import loadingGif from '../media/loader.gif';
 
 export const Courses = () => {
   const [courses, setCourses] = useState([]);
@@ -29,7 +30,11 @@ export const Courses = () => {
   }, [fetchCourses]);
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div className='loading-container'>
+        <img src={loadingGif} alt="loader" className='loading' />
+      </div>
+    )
   }
 
   if (error) {
@@ -39,17 +44,17 @@ export const Courses = () => {
   return (
     <div className="courses-container">
       {courses.length === 0 ? (
-        <p>No courses available.</p>
+        <div className="error">No courses available.</div>
       ) : (
         courses.map((course) => (
           <div key={course._id} className="schedule-card card-1x1">
             <img src={course.thumbnail} alt="course-thumbnail" />
-              <h3>{course.title} ({course.code})</h3>
-              <p>{course.description}</p>
-              <p>
-                <span className="material-symbols-outlined">school</span>
-                Teacher: {course.teacher.name}
-              </p>
+            <h3>{course.title} ({course.code})</h3>
+            <p>{course.description}</p>
+            <p>
+              <span className="material-symbols-outlined">school</span>
+              Teacher: {course.teacher?.firstName + " " + course.teacher?.lastName}
+            </p>
           </div>
         ))
       )}

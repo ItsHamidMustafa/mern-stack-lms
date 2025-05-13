@@ -1,9 +1,10 @@
 const Student = require("../models/Student");
+const Program = require('../models/Program');
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
+const createToken = (_id, role) => {
+  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
 };
 
 const getRegno = async () => {
@@ -11,6 +12,16 @@ const getRegno = async () => {
   const instituteCode = instituteName.slice(0, 3).toLowerCase();
   const d = new Date();
   const year = d.getFullYear();
+  const month = d.getMonth()
+
+  let semesterLetter;
+  if (month >= 0 && month <= 4) {
+    semesterLetter = 's';
+  } else if (month >= 7 && month <= 11) {
+    semesterLetter = 'f';
+  } else {
+    semesterLetter = 'summer-session';
+  }
 
   try {
     const lastStudent = await Student.findOne().sort({ _id: -1 });
@@ -18,49 +29,55 @@ const getRegno = async () => {
       ? parseInt(lastStudent.regno.split("-").pop())
       : 0;
     const newRegNum = lastRegNum + 1;
-    const regno = `${year}-${instituteCode}-${newRegNum.toString().padStart(4, "0")}`;
+    const regno = `${year}${semesterLetter}-${instituteCode}-${newRegNum.toString().padStart(4, "0")}`;
     return regno;
   } catch (err) {
     return err;
   }
 };
 
-const fetchCurrentStudent = async (req, res) => {
-  try {
-    const student = await Student.findById(req.student._id).select("-password");
+// const fetchCurrentStudent = async (req, res) => {
+//   try {
+//     const student = await Student.findById(req.student._id).select("-password");
 
-    if (!student) {
-      return res.status(404).json({ error: "Student not found!" });
-    }
+//     if (!student) {
+//       return res.status(404).json({ error: "Student not found!" });
+//     }
 
-    res.json({
-      _id: student._id,
-      firstName: student.firstName,
-      lastName: student.lastName,
-      dateOfBirth: student.dateOfBirth,
-      gender: student.gender,
-      semester: student.semester,
-      nationality: student.nationality,
-      contactNumber: student.contactNumber,
-      email: student.email,
-      currentStatus: student.currentStatus,
-      gradeLevel: student.gradeLevel,
-      major: student.major,
-      coursesEnrolled: student.coursesEnrolled,
-      advisor: student.advisor,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve student!" });
-  }
-};
+//     res.json({
+//       _id: student._id,
+//       firstName: student.firstName,
+//       lastName: student.lastName,
+//       dateOfBirth: student.dateOfBirth,
+//       gender: student.gender,
+//       semester: student.semester,
+//       nationality: student.nationality,
+//       contactNumber: student.contactNumber,
+//       email: student.email,
+//       currentStatus: student.currentStatus,
+//       gradeLevel: student.gradeLevel,
+//       major: student.major,
+//       coursesEnrolled: student.coursesEnrolled,
+//       advisor: student.advisor,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to retrieve student!" });
+//   }
+// };
 
 const loginStudent = async (req, res) => {
-  const { email, password } = req.body;
+  const { regno, password } = req.body;
 
   try {
-    const student = await Student.login(email, password);
-    const token = createToken(student._id);
-    res.status(200).json({ ...student._doc, token });
+    const student = await Student.login(regno, password);
+    const token = createToken(student._id, student.role);
+    res.status(200).json({
+      _id: student._id,
+      firstName: student.firstName,
+      role: student.role,
+      token
+    });
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -69,14 +86,35 @@ const loginStudent = async (req, res) => {
 const signupStudent = async (req, res) => {
   try {
     const regno = await getRegno();
-    console.log(regno, typeof regno);
-    const student = await Student.signup({ regno, ...req.body });
-    const token = createToken(student._id);
-    res.status(200).json({ ...student, token });
+    const program = await Program.findById(req.body.selectedProgram).populate('departmentId');
+    console.log(req.body.selectedProgram)
+    if (!program) {
+      return res.status(404).json({ error: "Program not found." });
+    }
+    if (!program.departmentId) {
+      return res.status(404).json({ error: "Associated department not found." });
+    }
+    const studentData = {
+      ...req.body,
+      regno,
+      program: program._id,
+      department: program.departmentId,
+    };
+    const student = await Student.signup(studentData);
+    const token = createToken(student._id, student.role);
+    res.status(200).json({
+      _id: student._id,
+      firstName: student.firstName,
+      role: student.role,
+      token,
+    });
+
   } catch (error) {
+    console.error("Signup Error:", error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const fetchAll = async (req, res) => {
   const student = await Student.find().sort({ created_at: -1 });
@@ -245,5 +283,4 @@ module.exports = {
   deleteStudent,
   loginStudent,
   signupStudent,
-  fetchCurrentStudent,
 };

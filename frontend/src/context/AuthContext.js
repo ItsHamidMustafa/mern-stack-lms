@@ -5,9 +5,13 @@ export const AuthContext = createContext();
 export const authReducer = (state, action) => {
     switch (action.type) {
         case 'LOGIN':
-            return { student: action.payload }
+            return { user: action.payload, loading: false, error: null };
         case 'LOGOUT':
-            return { student: null };
+            return { user: null, loading: false, error: null };
+        case 'SET_LOADING':
+            return { ...state, loading: true };
+        case 'SET_ERROR':
+            return { user: null, loading: false, error: action.payload };
         default:
             return state;
     }
@@ -15,30 +19,42 @@ export const authReducer = (state, action) => {
 
 export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, {
-        student: null
+        user: null,
+        loading: true, // Start with loading true
+        error: null,
     });
 
-    const fetchStudent = async (token) => {
-        const response = await fetch('/api/students/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`
+    const fetchUser  = async (token) => {
+        dispatch({ type: 'SET_LOADING' }); // Set loading to true
+
+        try {
+            const response = await fetch('/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const user = await response.json();
+
+            if (response.ok) {
+                dispatch({ type: 'LOGIN', payload: user.user });
+            } else {
+                dispatch({ type: 'SET_ERROR', payload: user.error });
+                console.error('Error fetching user: ', user.error);
             }
-        });
 
-        const student = await response.json();
-
-        if (response.ok) {
-            dispatch({ type: 'LOGIN', payload: student });
-        } else {
-            console.error('Error fetching student: ', student.error);
+        } catch (error) {
+            console.error("Network error: ", error);
+            dispatch({ type: "LOGOUT" });
         }
     };
 
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem('token'));
-
         if (token) {
-            fetchStudent(token);
+            fetchUser (token);
+        } else {
+            dispatch({ type: 'LOGOUT' });
         }
     }, []);
 

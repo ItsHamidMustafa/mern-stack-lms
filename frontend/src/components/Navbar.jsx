@@ -4,16 +4,20 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import UserTray from './UserTray'
 
 export const Navbar = () => {
-    const { student } = useAuthContext();
-
+    const { user, loading } = useAuthContext();
     const location = useLocation();
+
+    if (loading) {
+        return <div>Loading...</div>
+    }
+
     return (
         <nav>
             <div className='nav-left font-size-large'>
-                <span>Hello {student ? student.firstName : 'Traveller'} 👋</span>
+                <span>Hello {user ? user.firstName : 'Traveller'} 👋</span>
             </div>
             <div className='nav-right'>
-                {student ? (
+                {user ? (
                     <>
                         <span className="material-symbols-outlined col-white font-size-large">
                             notifications

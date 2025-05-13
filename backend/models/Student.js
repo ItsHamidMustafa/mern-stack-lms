@@ -26,10 +26,23 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    classId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Class",
+      required: false
+    },
+    department: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      required: true,
+    },
+    fatherName: {
+      type: String,
+      required: true,
+    },
     semester: {
       type: Number,
-      required: true,
-      default: 1,
+      required: false,
     },
     className: {
       type: String,
@@ -56,10 +69,6 @@ const studentSchema = new mongoose.Schema(
         },
         message: "Student must be at least 15 years old",
       },
-    },
-    classId: {
-      type: mongoose.Types.ObjectId,
-      required: false,
     },
     gender: {
       type: String,
@@ -113,10 +122,6 @@ const studentSchema = new mongoose.Schema(
         ref: "Course",
       },
     ],
-    advisor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Staff",
-    },
     gpa: {
       type: Number,
       min: 0,
@@ -145,7 +150,7 @@ const studentSchema = new mongoose.Schema(
     accountStatus: {
       type: String,
       enum: ["active", "pending", "deactivated"],
-      default: "active",
+      default: "pending",
     },
     emergencyContact: {
       name: {
@@ -181,6 +186,7 @@ studentSchema.statics.signup = async function (studentData) {
     nationality,
     contactNumber,
     email,
+    fatherName,
     address,
     password,
     currentStatus,
@@ -228,32 +234,38 @@ studentSchema.statics.signup = async function (studentData) {
     lastName: student.lastName,
     dateOfBirth: student.dateOfBirth,
     gender: student.gender,
+    fatherName: student.fatherName,
     nationality: student.nationality,
-    contactNumber: student.contactNumber,
+    contactNum: student.contactNum,
     email: student.email,
     currentStatus: student.currentStatus,
     gradeLevel: student.gradeLevel,
     major: student.major,
     coursesEnrolled: student.coursesEnrolled,
     advisor: student.advisor,
+    role: student.role
   };
 };
 
-studentSchema.statics.login = async function (email, password) {
-  if (!email || !password) {
+studentSchema.statics.login = async function (regno, password) {
+  if (!regno || !password) {
     throw Error("All fields must be filled!");
   }
 
-  const student = await this.findOne({ email });
+  const student = await this.findOne({ regno });
 
   if (!student) {
-    throw Error("We cannot find a student with that email!");
+    throw Error("We cannot find a student with that registration number!");
   }
 
   const match = await bcrypt.compare(password, student.password);
 
   if (!match) {
     throw Error("Incorrect password, please try again!");
+  }
+
+  if (student.accountStatus !== "active") {
+    throw Error("Your account is not approved yet. Please wait for admin approval.");
   }
 
   return student;

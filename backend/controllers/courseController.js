@@ -4,25 +4,45 @@ const mongoose = require("mongoose");
 
 const fetchAllCourses = async (req, res) => {
   try {
-    const studentId = req.student._id;
-    const student =
-      await Student.findById(studentId).populate({
+    const studentId = req.user._id;
+    const student = await Student.findById(studentId)
+      .populate({
         path: "coursesEnrolled",
         model: "courses",
         populate: {
           path: "teacher",
-          model: "teachers"
+          model: "Teacher",
+          select: "firstName lastName regno _id"
         }
       });
+
     if (!student) {
       return res.status(404).json({ error: "Student not found!" });
     }
 
-    return res.status(200).json(student.coursesEnrolled);
+    const formattedCourses = student.coursesEnrolled.map(course => ({
+      _id: course._id,
+      title: course.title,
+      description: course.description,
+      code: course.code,
+      thumbnail: course.thumbnail,
+      introVideoUrl: course.introVideoUrl,
+      teacher: course.teacher
+        ? {
+          firstName: course.teacher.firstName,
+          lastName: course.teacher.lastName,
+          email: course.teacher.email,
+          role: course.teacher.role
+        }
+        : null
+    }));
+
+    return res.status(200).json(formattedCourses);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
 };
+
 
 const fetchOneCourse = async (req, res) => {
   const { id } = req.params;
@@ -31,7 +51,7 @@ const fetchOneCourse = async (req, res) => {
     return res.status(400).json({ error: "Could not find that Course!" });
   }
 
-  const Course = await Course.findById(id).populate("teacher");
+  const Course = await Course.findById(id).populate("Teacher");
 
   if (!Course) {
     return res.status(200).json({ msg: "This Course is not available!" });
@@ -44,47 +64,49 @@ const createCourse = async (req, res) => {
   const {
     title,
     description,
-    category,
-    level,
+    classId,
+    slug,
+    code,
     teacher,
-    modules,
-    duration,
-    language,
-    tags,
+    isPublished,
     thumbnail,
     introVideoUrl,
-    completionCertificate,
+    enrollmentCount,
   } = req.body;
 
-  if (!mongoose.Types.ObjectId.isValid(category)) {
-    res.status(400).json({
-      error: "Invalid category, check if that category already exists!",
-    });
-    return;
-  }
-
   try {
-    const Course = await Course.create({
+    // Validate classId and teacher ID
+    if (!mongoose.Types.ObjectId.isValid(classId)) {
+      return res.status(400).json({ error: "Invalid class ID." });
+    }
+    if (!mongoose.Types.ObjectId.isValid(teacher)) {
+      return res.status(400).json({ error: "Invalid teacher ID." });
+    }
+
+    // unique slug check
+    const existingSlug = await Course.findOne({ slug });
+    if (existingSlug) {
+      return res.status(400).json({ error: "Course slug must be unique." });
+    }
+
+    // Create the course
+    const newCourse = new Course({
       title,
       description,
-      category,
-      level,
+      classId,
+      slug,
+      code,
       teacher,
-      modules,
-      duration,
-      language,
-      tags,
+      isPublished,
       thumbnail,
       introVideoUrl,
-      completionCertificate,
+      enrollmentCount,
     });
 
-    res.status(200).json(Course);
-    return;
-  } catch (err) {
-    res
-      .status(401)
-      .json({ error: "Error creating Course, double check all the inputs!" });
+    await newCourse.save();
+    res.status(201).json({ message: "Course created successfully", newCourse });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error", details: error });
   }
 };
 

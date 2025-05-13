@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt')
 const Schema = mongoose.Schema;
 
 const teacherSchema = new Schema({
@@ -9,6 +10,10 @@ const teacherSchema = new Schema({
     lastName: {
         type: String,
         required: true,
+    },
+    regno: {
+        type: String,
+        required: true
     },
     dob: {
         type: Date,
@@ -21,6 +26,10 @@ const teacherSchema = new Schema({
     gender: {
         type: String,
         enum: ['Male', 'Female', 'Other']
+    },
+    subject: {
+        type: String,
+        required: true
     },
     joinedAt: {
         type: Date,
@@ -51,6 +60,11 @@ const teacherSchema = new Schema({
     password: {
         type: String,
         required: true,
+    },
+    role: {
+        type: String,
+        default: "teacher",
+        required: true,
     }
 });
 
@@ -73,15 +87,15 @@ teacherSchema.statics.signup = async function (teacherData) {
     return teacher;
 };
 
-teacherSchema.statics.login = async function (email, password) {
-    if (!email || !password) {
+teacherSchema.statics.login = async function (regno, password) {
+    if (!regno || !password) {
         throw Error("All fields must be filled!");
     }
 
-    const teacher = await this.findOne({ email });
+    const teacher = await this.findOne({ regno });
 
     if (!teacher) {
-        throw Error("We cannot find a teacher with that email!");
+        throw Error("We cannot find a teacher with that registration number!");
     }
 
     const match = await bcrypt.compare(password, teacher.password);
@@ -93,4 +107,4 @@ teacherSchema.statics.login = async function (email, password) {
     return teacher;
 };
 
-module.exports = mongoose.model('teachers', teacherSchema);
+module.exports = mongoose.model('Teacher', teacherSchema);

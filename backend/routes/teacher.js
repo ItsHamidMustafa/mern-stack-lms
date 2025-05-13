@@ -1,14 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const checkRole = require('../middlewares/checkRole');
-const auth = require('../middlewares/requireAuth');
-const { signupTeacher, loginTeacher, createTeacher, updateTeacher, deleteTeacher, fetchAll } = require('../controllers/teacherController');
+const { requireAuth } = require('../middlewares/requireAuth');
+const { signupTeacher, loginTeacher, fetchCurrentTeacher, fetchOne } = require('../controllers/teacherController');
 
-router.get('/fetch', auth, fetchAll);
-router.post('/create', createTeacher);
+router.get('/me', requireAuth, fetchCurrentTeacher);
 router.post('/signup', signupTeacher);
 router.post('/login', loginTeacher);
-router.patch('/update/:id', auth, checkRole([1, 2]), updateTeacher);
-router.delete('/delete/:id', auth, checkRole([1, 2]), deleteTeacher);
+router.get('/fetch/:id', fetchOne);
 
 module.exports = router;
