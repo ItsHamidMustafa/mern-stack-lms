@@ -36,35 +36,6 @@ const getRegno = async () => {
   }
 };
 
-// const fetchCurrentStudent = async (req, res) => {
-//   try {
-//     const student = await Student.findById(req.student._id).select("-password");
-
-//     if (!student) {
-//       return res.status(404).json({ error: "Student not found!" });
-//     }
-
-//     res.json({
-//       _id: student._id,
-//       firstName: student.firstName,
-//       lastName: student.lastName,
-//       dateOfBirth: student.dateOfBirth,
-//       gender: student.gender,
-//       semester: student.semester,
-//       nationality: student.nationality,
-//       contactNumber: student.contactNumber,
-//       email: student.email,
-//       currentStatus: student.currentStatus,
-//       gradeLevel: student.gradeLevel,
-//       major: student.major,
-//       coursesEnrolled: student.coursesEnrolled,
-//       advisor: student.advisor,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to retrieve student!" });
-//   }
-// };
-
 const loginStudent = async (req, res) => {
   const { regno, password } = req.body;
 
