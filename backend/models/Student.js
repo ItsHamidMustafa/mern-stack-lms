@@ -236,7 +236,7 @@ studentSchema.statics.signup = async function (studentData) {
     gender: student.gender,
     fatherName: student.fatherName,
     nationality: student.nationality,
-    contactNum: student.contactNum,
+    contactNumber: student.contactNumber,
     email: student.email,
     currentStatus: student.currentStatus,
     gradeLevel: student.gradeLevel,
