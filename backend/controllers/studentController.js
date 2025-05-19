@@ -87,7 +87,7 @@ const signupStudent = async (req, res) => {
 };
 
 
-const fetchAll = async (req, res) => {
+const fetchAllStudents = async (req, res) => {
   const student = await Student.find().sort({ created_at: -1 });
   if (!student) {
     return res.status(200).json({ msg: "No student found!" });
@@ -247,7 +247,7 @@ const deleteStudent = async (req, res) => {
 };
 
 module.exports = {
-  fetchAll,
+  fetchAllStudents,
   fetchOneStudent,
   createStudent,
   updateStudent,

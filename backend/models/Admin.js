@@ -43,7 +43,7 @@ const adminSchema = new Schema({
         type: Boolean,
         default: true
     },
-    contactNum: {
+    contactNumber: {
         type: Number,
         default: null
     },
