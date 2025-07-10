@@ -12,7 +12,7 @@ const fetchAllCourses = async (req, res) => {
         populate: {
           path: "teacher",
           model: "Teacher",
-          select: "firstName lastName regno _id"
+          select: "firstName lastName uid _id"
         }
       });
 
@@ -32,7 +32,8 @@ const fetchAllCourses = async (req, res) => {
           firstName: course.teacher.firstName,
           lastName: course.teacher.lastName,
           email: course.teacher.email,
-          role: course.teacher.role
+          role: course.teacher.role,
+          _id: course.teacher._id
         }
         : null
     }));

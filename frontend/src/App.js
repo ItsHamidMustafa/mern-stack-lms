@@ -17,6 +17,8 @@ import { Help } from "./pages/Help";
 import { Error } from "./pages/Error";
 import { Teachers } from "./pages/Teachers";
 import { Teacher } from "./pages/Teacher";
+import { Programs } from "./pages/Programs";
+import {Departments} from "./pages/Departments";
 
 function App() {
   const { user, loading } = useAuthContext();
@@ -59,8 +61,16 @@ function App() {
               element={user?.role === 'admin' ? <Teachers /> : <Navigate to="/" />}
             />
             <Route
+              path="/programs"
+              element={user?.role === 'admin' ? <Programs /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/departments"
+              element={user?.role === 'admin' ? <Departments /> : <Navigate to="/" />}
+            />
+            <Route
               path="/teacher/:id"
-              element={user?.role === 'admin' ? <Teacher /> : <Navigate to="/" />}
+              element={<Teacher />}
             />
             <Route
               path="/analytics"

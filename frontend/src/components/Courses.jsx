@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import loadingGif from '../media/loader.gif';
+import { Link } from "react-router-dom";
 
 export const Courses = () => {
   const [courses, setCourses] = useState([]);
@@ -51,10 +52,12 @@ export const Courses = () => {
             <img src={course.thumbnail} alt="course-thumbnail" />
             <h3>{course.title} ({course.code})</h3>
             <p>{course.description}</p>
-            <p>
-              <span className="material-symbols-outlined">school</span>
-              Teacher: {course.teacher?.firstName + " " + course.teacher?.lastName}
-            </p>
+            <Link to={'/teacher/' + course.teacher._id} className='col-white w-100p'>
+              <p>
+                <span className="material-symbols-outlined">school</span>
+                Teacher: {course.teacher?.firstName + " " + course.teacher?.lastName}
+              </p>
+            </Link>
           </div>
         ))
       )}

@@ -7,30 +7,30 @@ export const useLogin = () => {
     const { dispatch } = useAuthContext();
     let instname = process.env.REACT_APP_INST_NAME.toLowerCase()
 
-    const checkUser = (regno) => {
+    const checkUser = (uid) => {
         const studentRegex = new RegExp(`^\\d{4}([sf])-${instname}-\\d{4}$`);
-        if (studentRegex.test(regno)) {
+        if (studentRegex.test(uid)) {
             return 'student';
         }
 
         const adminRegex = /^[a-zA-Z]+\.admin$/;
-        if (adminRegex.test(regno)) {
+        if (adminRegex.test(uid)) {
             return 'admin';
         }
 
         const teacherRegex = /^[a-zA-Z]+\.[a-zA-Z]+$/;
-        if (teacherRegex.test(regno)) {
+        if (teacherRegex.test(uid)) {
             return 'teacher';
         }
 
         return null;
     };
 
-    const login = async (regno, password) => {
+    const login = async (uid, password) => {
         setIsLoading(true);
         setError(null);
 
-        const userType = checkUser(regno);
+        const userType = checkUser(uid);
         let apiEndpoint;
 
 
@@ -53,7 +53,7 @@ export const useLogin = () => {
         const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ regno, password })
+            body: JSON.stringify({ uid, password })
         });
 
         const json = await response.json();

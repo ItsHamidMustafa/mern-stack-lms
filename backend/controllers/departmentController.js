@@ -1,12 +1,12 @@
 const Department = require('../models/Department');
 
 const createDepartment = async (req, res) => {
-    const { name } = req.body;
+    const { name, slug } = req.body;
     try {
         const exist = await Department.findOne({ name });
         if (exist) return res.status(400).json({ error: 'Department already exists' });
 
-        const department = await Department.create({ name });
+        const department = await Department.create({ name, slug });
         res.status(201).json(department);
     } catch (error) {
         res.status(400).json({ error: error.message });

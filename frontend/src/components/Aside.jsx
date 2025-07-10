@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthContext } from "../hooks/useAuthContext";
 
@@ -76,7 +76,7 @@ export const Aside = () => {
             <span className="material-symbols-outlined">monitoring</span>
             Analytics
           </Link>
-          {!loading && user?.role !== 'admin' ?
+          {(!loading && user?.role !== 'admin') ?
             <Link
               className={location.pathname === "/assignments" ? "active" : ""}
               to="/assignments"
@@ -85,13 +85,27 @@ export const Aside = () => {
               Assignments
             </Link>
             :
-            <Link
-              className={location.pathname === "/teachers" ? "active" : ""}
-              to="/teachers"
-            >
-              <span className="material-symbols-outlined">school</span>
-              Teachers
-            </Link>
+            <>
+              <Link
+                className={location.pathname === "/teachers" ? "active" : ""}
+                to="/teachers"
+              >
+                <span className="material-symbols-outlined">school</span>
+                Teachers
+              </Link>
+              <Link className={location.pathname === "/programs" ? "active" : ""}
+                to='/programs'
+              >
+                <span className="material-symbols-outlined">stack</span>
+                Programs
+              </Link>
+              <Link className={location.pathname === "/departments" ? "active" : ""}
+                to='/departments'
+              >
+                <span className="material-symbols-outlined">domain</span>
+                Departments
+              </Link>
+            </>
           }
           <Link
             className={location.pathname === "/messages" ? "active" : ""}

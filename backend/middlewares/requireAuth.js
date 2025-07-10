@@ -78,7 +78,7 @@ const completeMe = async (req, res, next) => {
                     contactNumber: user.contactNumber,
                     fatherName: user.fatherName,
                     cnic: user.cnic,
-                    regno: user.regno
+                    uid: user.uid
                 }
                 break;
             case 'teacher':
@@ -87,10 +87,10 @@ const completeMe = async (req, res, next) => {
                     _id: user._id,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    contactNumber: user.contactNum,
+                    contactNumber: user.contactNumber,
                     fatherName: user.fatherName,
                     cnic: user.cnic,
-                    regno: user.regno
+                    uid: user.uid
                 }
                 break;
             case 'admin':
@@ -99,10 +99,10 @@ const completeMe = async (req, res, next) => {
                     _id: user._id,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    contactNumber: user.contactNum,
+                    contactNumber: user.contactNumber,
                     fatherName: user.fatherName,
                     cnic: user.cnic,
-                    regno: user.regno
+                    uid: user.uid
                 }
                 break;
             default:

@@ -9,7 +9,7 @@ const studentSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    regno: {
+    uid: {
       type: String,
       required: false,
       unique: true,
@@ -236,7 +236,7 @@ studentSchema.statics.signup = async function (studentData) {
     gender: student.gender,
     fatherName: student.fatherName,
     nationality: student.nationality,
-    contactNum: student.contactNum,
+    contactNumber: student.contactNumber,
     email: student.email,
     currentStatus: student.currentStatus,
     gradeLevel: student.gradeLevel,
@@ -247,12 +247,12 @@ studentSchema.statics.signup = async function (studentData) {
   };
 };
 
-studentSchema.statics.login = async function (regno, password) {
-  if (!regno || !password) {
+studentSchema.statics.login = async function (uid, password) {
+  if (!uid || !password) {
     throw Error("All fields must be filled!");
   }
 
-  const student = await this.findOne({ regno });
+  const student = await this.findOne({ uid });
 
   if (!student) {
     throw Error("We cannot find a student with that registration number!");
