@@ -11,7 +11,7 @@ const teacherSchema = new Schema({
         type: String,
         required: true,
     },
-    regno: {
+    uid: {
         type: String,
         required: true
     },
@@ -27,8 +27,9 @@ const teacherSchema = new Schema({
         type: String,
         enum: ['Male', 'Female', 'Other']
     },
-    subject: {
-        type: String,
+    department: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Department',
         required: true
     },
     joinedAt: {
@@ -69,7 +70,7 @@ const teacherSchema = new Schema({
 });
 
 teacherSchema.statics.signup = async function (teacherData) {
-    const { email, password, firstName, lastName, fatherName, dob, cnic, gender, contactNum } = teacherData;
+    const { email, password, firstName, lastName, fatherName, dob, cnic, gender, contactNumber, department } = teacherData;
     const exists = await this.findOne({ email });
     
     if (!email || !password) {
@@ -87,12 +88,12 @@ teacherSchema.statics.signup = async function (teacherData) {
     return teacher;
 };
 
-teacherSchema.statics.login = async function (regno, password) {
-    if (!regno || !password) {
+teacherSchema.statics.login = async function (uid, password) {
+    if (!uid || !password) {
         throw Error("All fields must be filled!");
     }
 
-    const teacher = await this.findOne({ regno });
+    const teacher = await this.findOne({ uid });
 
     if (!teacher) {
         throw Error("We cannot find a teacher with that registration number!");

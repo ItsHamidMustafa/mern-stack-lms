@@ -107,11 +107,11 @@ export const Profile = () => {
                 readOnly
               />
             </label>
-            <label htmlFor="regno" className="col-white">
-              Registration Number
+            <label htmlFor="uid" className="col-white">
+              UID
               <input
-                value={formData.regno || ''}
-                id="regno"
+                value={formData.uid || ''}
+                id="uid"
                 className="input-box"
                 readOnly
               />

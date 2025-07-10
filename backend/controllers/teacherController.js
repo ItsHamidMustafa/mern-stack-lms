@@ -5,7 +5,7 @@ const createToken = (_id, role) => {
     return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
 };
 
-const getRegno = async (firstName, lastName, subject) => {
+const getUid = async (firstName, lastName, subject) => {
     const lowerFirstName = firstName.toLowerCase().replace(/\s+/g, '');
     const lowerLastName = lastName.toLowerCase().replace(/\s+/g, '');
     const lowerSubject = subject.toLowerCase().replace(/\s+/g, '');
@@ -16,7 +16,7 @@ const fetchOne = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const teacher = await Teacher.findById(id);
+        const teacher = await Teacher.findById(id).populate('department', 'name');
         if (!teacher) {
             return res.status(404).json({ msg: "No such teacher found!" });
         }
@@ -28,10 +28,10 @@ const fetchOne = async (req, res) => {
 };
 
 const loginTeacher = async (req, res) => {
-    const { regno, password } = req.body;
+    const { uid, password } = req.body;
 
     try {
-        const teacher = await Teacher.login(regno, password);
+        const teacher = await Teacher.login(uid, password);
         const token = createToken(teacher._id, teacher.role);
         res.status(200).json({
             _id: teacher._id,
@@ -46,8 +46,8 @@ const loginTeacher = async (req, res) => {
 
 const signupTeacher = async (req, res) => {
     try {
-        const regno = await getRegno(req.body.firstName, req.body.lastName, req.body.subject);
-        const teacher = await Teacher.signup({ ...req.body, role: "teacher", regno });
+        const uid = await getUid(req.body.firstName, req.body.lastName, req.body.subject);
+        const teacher = await Teacher.signup({ ...req.body, role: "teacher", uid });
         const token = createToken(teacher._id, teacher.role);
         res.status(200).json({ ...teacher, token });
     } catch (error) {

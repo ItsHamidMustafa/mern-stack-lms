@@ -35,16 +35,16 @@ export const Teacher = () => {
     return (
         <div className="teacher-card-container">
             <h2>{teacher.firstName} {teacher.lastName}</h2>
+            <span><strong>UID:</strong> {teacher.uid}</span>
             <span><strong>Date of Birth:</strong>{" "}
                 {teacher?.dob && new Date(teacher.dob).toLocaleDateString('en-US', {
                     dateStyle: 'medium',
                 })}
             </span>
-            <span><strong>Subject:</strong> {teacher.subject}</span>
+            <span><strong>Department:</strong> {teacher.department.name}</span>
             <span><strong>Email:</strong> {teacher.email}</span>
             <span><strong>Gender:</strong> {teacher.gender}</span>
-            <span><strong>Reg No:</strong> {teacher.regno}</span>
-            <span><strong>Contact:</strong> {teacher.contactNum}</span>
+            <span><strong>Contact:</strong> {teacher.contactNumber}</span>
             <span>
                 <strong>Joined at:</strong>{" "}
                 {teacher?.joinedAt && new Date(teacher.joinedAt).toLocaleString('en-US', {

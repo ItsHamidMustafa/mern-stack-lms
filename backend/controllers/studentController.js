@@ -7,7 +7,7 @@ const createToken = (_id, role) => {
   return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
 };
 
-const getRegno = async () => {
+const getUid = async () => {
   const instituteName = process.env.INST_NAME || "xyz";
   const instituteCode = instituteName.slice(0, 3).toLowerCase();
   const d = new Date();
@@ -26,21 +26,21 @@ const getRegno = async () => {
   try {
     const lastStudent = await Student.findOne().sort({ _id: -1 });
     const lastRegNum = lastStudent
-      ? parseInt(lastStudent.regno.split("-").pop())
+      ? parseInt(lastStudent.uid.split("-").pop())
       : 0;
     const newRegNum = lastRegNum + 1;
-    const regno = `${year}${semesterLetter}-${instituteCode}-${newRegNum.toString().padStart(4, "0")}`;
-    return regno;
+    const uid = `${year}${semesterLetter}-${instituteCode}-${newRegNum.toString().padStart(4, "0")}`;
+    return uid;
   } catch (err) {
     return err;
   }
 };
 
 const loginStudent = async (req, res) => {
-  const { regno, password } = req.body;
+  const { uid, password } = req.body;
 
   try {
-    const student = await Student.login(regno, password);
+    const student = await Student.login(uid, password);
     const token = createToken(student._id, student.role);
     res.status(200).json({
       _id: student._id,
@@ -56,7 +56,7 @@ const loginStudent = async (req, res) => {
 
 const signupStudent = async (req, res) => {
   try {
-    const regno = await getRegno();
+    const uid = await getUid();
     const program = await Program.findById(req.body.selectedProgram).populate('departmentId');
     console.log(req.body.selectedProgram)
     if (!program) {
@@ -67,7 +67,7 @@ const signupStudent = async (req, res) => {
     }
     const studentData = {
       ...req.body,
-      regno,
+      uid,
       program: program._id,
       department: program.departmentId,
     };
@@ -150,9 +150,9 @@ const createStudent = async (req, res) => {
   }
 
   try {
-    const regno = getRegno();
+    const uid = getUid();
 
-    if (!regno) {
+    if (!uid) {
       return res
         .status(301)
         .json({ error: "Internal error, please report to staff!" });
@@ -160,7 +160,7 @@ const createStudent = async (req, res) => {
 
     const studentData = {
       cnic,
-      regno,
+      uid,
       firstName,
       lastName,
       dateOfBirth,

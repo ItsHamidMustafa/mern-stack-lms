@@ -11,7 +11,7 @@ const adminSchema = new Schema({
         type: String,
         required: true,
     },
-    regno: {
+    uid: {
         type: String,
         required: true
     },
@@ -65,7 +65,7 @@ const adminSchema = new Schema({
 });
 
 adminSchema.statics.signup = async function (adminData) {
-    const { email, password, firstName, lastName, fatherName, dob, cnic, gender, contactNum } = adminData;
+    const { email, password, firstName, lastName, fatherName, dob, cnic, gender, contactNumber } = adminData;
     const exists = await this.findOne({ email });
     
     if (!email || !password) {
@@ -83,12 +83,12 @@ adminSchema.statics.signup = async function (adminData) {
     return admin;
 };
 
-adminSchema.statics.login = async function (regno, password) {
-    if (!regno || !password) {
+adminSchema.statics.login = async function (uid, password) {
+    if (!uid || !password) {
         throw Error("All fields must be filled!");
     }
 
-    const admin = await this.findOne({ regno });
+    const admin = await this.findOne({ uid });
 
     if (!admin) {
         throw Error("We cannot find a admin with that registration number!");
