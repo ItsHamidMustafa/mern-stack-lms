@@ -1,12 +1,12 @@
 const bcrypt = require('bcrypt');
-const { getUserByIdAndRole } = require('../utils/getUserByIdAndRole');
+const User = require('../models/User');
 
 const updateOwnPassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
-    const { _id, role } = req.user;
+    const { _id } = req.user;
 
     try {
-        const user = await getUserByIdAndRole(_id, role);
+        const user = await User.findById(_id);
         if (!user) return res.status(404).json({ msg: 'User not found' });
 
         const isMatch = await bcrypt.compare(currentPassword, user.password);

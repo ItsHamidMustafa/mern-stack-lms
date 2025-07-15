@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Student = require('../models/Student');
-const Teacher = require('../models/Teacher');
-const Admin = require('../models/Admin');
+const User = require('../models/User');
 
 const requireAuth = async (req, res, next) => {
     const { authorization } = req.headers;
@@ -15,47 +13,61 @@ const requireAuth = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.SECRET);
         if (!decoded) return res.status(401).json({ message: "Invalid token" });
-        let user;
-        switch (decoded.role) {
-            case 'student':
-                user = await Student.findById(decoded._id);
-                user = {
-                    _id: user._id,
-                    firstName: user.firstName,
-                    role: user.role,
-                }
-                break;
-            case 'teacher':
-                user = await Teacher.findById(decoded._id);
-                user = {
-                    _id: user._id,
-                    firstName: user.firstName,
-                    role: user.role
-                }
-                break;
-            case 'admin':
-                user = await Admin.findById(decoded._id);
-                user = {
-                    _id: user._id,
-                    firstName: user.firstName,
-                    role: user.role
-                }
-                break;
-            default:
-                return res.status(401).json({ error: 'Invalid user role!' });
+
+        // Find user by ID from token
+        const user = await User.findById(decoded.userId);
+        
+        if (!user) {
+            return res.status(401).json({ error: 'User not found!' });
         }
 
-        if (!user) {
-            return res.status(401).json({ error: `${role.charAt(0).toUpperCase() + role.slice(1)} not found!` });
+        if (!user.isActive) {
+            return res.status(401).json({ error: 'User account is deactivated!' });
         }
-        req.user = user;
+
+        // Get role-specific profile
+        const profile = await user.getProfile();
+        
+        if (!profile) {
+            return res.status(401).json({ error: 'User profile not found!' });
+        }
+
+        // Attach user data to request object
+        req.user = {
+            _id: user._id,
+            uid: user.uid,
+            email: user.email,
+            role: user.role,
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            profileId: profile._id
+        };
+
         next();
     } catch (error) {
-        res.status(401).json({ error: 'Request is not authorized!', token });
+        res.status(401).json({ error: 'Request is not authorized!', details: error.message });
     }
 }
 
-const completeMe = async (req, res, next) => {
+const requireRole = (allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({ error: 'User not authenticated!' });
+        }
+
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({ 
+                error: 'Access denied! Insufficient permissions.',
+                requiredRole: allowedRoles,
+                userRole: req.user.role
+            });
+        }
+
+        next();
+    };
+};
+
+const getCompleteProfile = async (req, res, next) => {
     const { authorization } = req.headers;
 
     if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -67,58 +79,56 @@ const completeMe = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.SECRET);
         if (!decoded) return res.status(401).json({ message: "Invalid token" });
-        let user;
-        switch (decoded.role) {
-            case 'student':
-                user = await Student.findById(decoded._id);
-                user = {
-                    _id: user._id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    contactNumber: user.contactNumber,
-                    fatherName: user.fatherName,
-                    cnic: user.cnic,
-                    uid: user.uid
-                }
-                break;
-            case 'teacher':
-                user = await Teacher.findById(decoded._id);
-                user = {
-                    _id: user._id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    contactNumber: user.contactNumber,
-                    fatherName: user.fatherName,
-                    cnic: user.cnic,
-                    uid: user.uid
-                }
-                break;
-            case 'admin':
-                user = await Admin.findById(decoded._id);
-                user = {
-                    _id: user._id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    contactNumber: user.contactNumber,
-                    fatherName: user.fatherName,
-                    cnic: user.cnic,
-                    uid: user.uid
-                }
-                break;
-            default:
-                return res.status(401).json({ error: 'Invalid user role!' });
+
+        // Find user by ID from token
+        const user = await User.findById(decoded.userId);
+        
+        if (!user) {
+            return res.status(401).json({ error: 'User not found!' });
         }
 
-        if (!user) {
-            return res.status(401).json({ error: `${role.charAt(0).toUpperCase() + role.slice(1)} not found!` });
+        if (!user.isActive) {
+            return res.status(401).json({ error: 'User account is deactivated!' });
         }
-        req.user = user;
+
+        // Get complete role-specific profile
+        const profile = await user.getProfile();
+        
+        if (!profile) {
+            return res.status(401).json({ error: 'User profile not found!' });
+        }
+
+        // Attach complete user data to request object
+        req.user = {
+            // User credentials info
+            _id: user._id,
+            uid: user.uid,
+            email: user.email,
+            role: user.role,
+            isActive: user.isActive,
+            lastLogin: user.lastLogin,
+            createdAt: user.createdAt,
+            
+            // Profile info
+            profileId: profile._id,
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            contactNumber: profile.contactNumber,
+            fatherName: profile.fatherName,
+            cnic: profile.cnic,
+            
+            // Complete profile object for role-specific data
+            profile: profile
+        };
+
         next();
     } catch (error) {
-        res.status(401).json({ error: 'Request is not authorized!', token });
+        res.status(401).json({ error: 'Request is not authorized!', details: error.message });
     }
 }
+
 module.exports = {
     requireAuth,
-    completeMe
+    requireRole,
+    getCompleteProfile,
 };

@@ -28,7 +28,7 @@ export const AuthContextProvider = ({ children }) => {
         dispatch({ type: 'SET_LOADING' }); // Set loading to true
 
         try {
-            const response = await fetch('/api/auth/me', {
+            const response = await fetch('/api/user/me', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

@@ -1,106 +1,85 @@
+const User = require('../models/User');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt')
 const Schema = mongoose.Schema;
 
 const adminSchema = new Schema({
-    firstName: {
-        type: String,
-        required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
-    uid: {
-        type: String,
-        required: true
-    },
-    dob: {
-        type: Date,
-        required: true
-    },
-    fatherName: {
-        type: String,
-        required: true
-    },
-    gender: {
-        type: String,
-        enum: ['Male', 'Female', 'Other']
-    },
-    joinedAt: {
-        type: Date,
-        default: Date.now
-    },
-    leftAt: {
-        type: Date,
-        default: null
-    },
-    cnic: {
-        type: String,
-        unique: true
-    },
-    isWorking: {
-        type: Boolean,
-        default: true
-    },
-    contactNumber: {
-        type: Number,
-        default: null
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    role: {
-        type: String,
-        default: "admin",
-        required: true,
-    }
+  // Reference to User schema
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
+  dob: {
+    type: Date,
+    required: true
+  },
+  fatherName: {
+    type: String,
+    required: true
+  },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other']
+  },
+  joinedAt: {
+    type: Date,
+    default: Date.now
+  },
+  leftAt: {
+    type: Date,
+    default: null
+  },
+  cnic: {
+    type: String,
+    unique: true
+  },
+  isWorking: {
+    type: Boolean,
+    default: true
+  },
+  contactNumber: {
+    type: Number,
+    default: null
+  }
 });
 
+// Updated signup method
 adminSchema.statics.signup = async function (adminData) {
-    const { email, password, firstName, lastName, fatherName, dob, cnic, gender, contactNumber } = adminData;
-    const exists = await this.findOne({ email });
-    
-    if (!email || !password) {
-        throw Error("All fields must be filled!");
-    }
+  const { uid, email, password, ...otherData } = adminData;
 
-    if (exists) {
-        throw Error("Email already in use");
-    }
+  // Create user first
+  const user = await User.createUser({
+    uid,
+    email,
+    password,
+    role: 'admin'
+  });
 
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
+  // Create admin profile
+  const admin = await this.create({
+    user: user._id,
+    ...otherData
+  });
 
-    const admin = await this.create({ ...adminData, password: hash });
-    return admin;
+  return {
+    user: {
+      _id: user._id,
+      uid: user.uid,
+      email: user.email,
+      role: user.role
+    },
+    profile: admin
+  };
 };
 
-adminSchema.statics.login = async function (uid, password) {
-    if (!uid || !password) {
-        throw Error("All fields must be filled!");
-    }
-
-    const admin = await this.findOne({ uid });
-
-    if (!admin) {
-        throw Error("We cannot find a admin with that registration number!");
-    }
-
-    const match = await bcrypt.compare(password, admin.password);
-
-    if (!match) {
-        throw Error("Incorrect password, please try again!");
-    }
-
-    return admin;
-};
+// Remove the login method as it's now handled by User model
 
 module.exports = mongoose.model('Admin', adminSchema);

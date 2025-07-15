@@ -11,6 +11,7 @@ const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require('./routes/adminRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const programRoutes = require('./routes/programRoutes');
+const userRoutes = require('./routes/user');
 
 app.use(express.json());
 
@@ -27,6 +28,7 @@ app.use("/api/help", helpRoutes);
 app.use("/api/auth", authRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/programs', programRoutes);
+app.use('/api/user', userRoutes);
 
 
 mongoose

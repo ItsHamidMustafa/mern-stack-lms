@@ -1,5 +1,5 @@
 const express = require("express");
-const { requireAuth, completeMe } = require("../middlewares/requireAuth");
+const { requireAuth, getCompleteProfile } = require("../middlewares/requireAuth");
 const { updateOwnPassword } = require('../controllers/authController');
 
 const router = express.Router();
@@ -8,7 +8,7 @@ router.get("/me", requireAuth, (req, res) => {
     res.status(200).json({ user: req.user });
 });
 
-router.get("/complete-me", completeMe, (req, res) => {
+router.get("/complete-me", getCompleteProfile, (req, res) => {
     res.status(200).json({ user: req.user });
 });
 

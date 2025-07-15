@@ -30,27 +30,7 @@ export const useLogin = () => {
         setIsLoading(true);
         setError(null);
 
-        const userType = checkUser(uid);
-        let apiEndpoint;
-
-
-        switch (userType) {
-            case 'student':
-                apiEndpoint = '/api/students/login';
-                break;
-            case 'teacher':
-                apiEndpoint = '/api/teachers/login';
-                break;
-            case 'admin':
-                console.log('case admin true');
-                apiEndpoint = '/api/admins/login';
-                break;
-            default:
-                setIsLoading(false);
-                setError('Invalid email format');
-                return;
-        }
-        const response = await fetch(apiEndpoint, {
+        const response = await fetch('/api/user/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ uid, password })
