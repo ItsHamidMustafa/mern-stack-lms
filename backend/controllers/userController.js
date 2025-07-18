@@ -16,6 +16,7 @@ const fetchCurrentUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+    const { uid, password } = req.body;
     try {
         const user = await User.login(uid, password);
         const token = tokenGenerator(user._id);

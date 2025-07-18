@@ -25,7 +25,7 @@ export const Schedule = () => {
   };
 
   useEffect(() => {
-    const token = JSON.parse(localStorage.getItem("token"));
+    const token = localStorage.getItem("token");
 
     if (token) {
       fetchClass(token);

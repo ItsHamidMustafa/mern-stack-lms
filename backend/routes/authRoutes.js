@@ -11,7 +11,6 @@ router.get("/me", requireAuth, (req, res) => {
 router.get("/complete-me", getCompleteProfile, (req, res) => {
     res.status(200).json({ user: req.user });
 });
-
 router.patch('/update-password', requireAuth, updateOwnPassword);
 
 module.exports = router;

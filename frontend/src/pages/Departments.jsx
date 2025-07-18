@@ -42,12 +42,13 @@ export const Departments = () => {
     }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setFormLoading(true);
     setFormError(null);
 
     try {
-      const token = JSON.parse(localStorage.getItem('token'));
+      const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token found');
       }
@@ -134,7 +135,7 @@ export const Departments = () => {
           </div>
         )}
 
-        <div className='login-container login'>
+        <form className='login-container login'>
           <div className='input-box'>
             <label htmlFor="department-name">Department Name:</label>
             <input
@@ -144,6 +145,7 @@ export const Departments = () => {
               value={formData.name}
               onChange={handleInputChange}
               required
+              autoComplete="true"
             />
           </div>
           <div className='input-box'>
@@ -166,7 +168,7 @@ export const Departments = () => {
               Cancel
             </button>
           </div>
-        </div>
+        </form>
       </div>
     );
   }

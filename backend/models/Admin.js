@@ -29,6 +29,11 @@ const adminSchema = new Schema({
     type: String,
     enum: ['Male', 'Female', 'Other']
   },
+  cnic: {
+    type: String,
+    required: true,
+    unique: true
+  },
   joinedAt: {
     type: Date,
     default: Date.now
@@ -36,10 +41,6 @@ const adminSchema = new Schema({
   leftAt: {
     type: Date,
     default: null
-  },
-  cnic: {
-    type: String,
-    unique: true
   },
   isWorking: {
     type: Boolean,

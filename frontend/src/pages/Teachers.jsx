@@ -24,7 +24,7 @@ export const Teachers = () => {
     });
     const [formLoading, setFormLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(null);
-    const token = JSON.parse(localStorage.getItem('token'));
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
         setLoading(true);

@@ -65,7 +65,7 @@ export const Programs = () => {
     setFormError(null);
 
     try {
-      const token = JSON.parse(localStorage.getItem('token'));
+      const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token found');
       }

@@ -15,7 +15,7 @@ export const Profile = () => {
 
   useEffect(() => {
     setLoading(true);
-    const token = JSON.parse(localStorage.getItem('token'));
+    const token = localStorage.getItem('token');
     const fetchUser = async () => {
       try {
         const res = await fetch('/api/auth/complete-me', {
@@ -50,7 +50,7 @@ export const Profile = () => {
     e.preventDefault();
     setPasswordError(null);
     setPasswordSuccess(null);
-    const token = JSON.parse(localStorage.getItem('token'));
+    const token = localStorage.getItem('token');
 
     try {
       const res = await fetch('/api/auth/update-password', {

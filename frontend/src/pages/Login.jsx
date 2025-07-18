@@ -3,7 +3,7 @@ import { useLogin } from "../hooks/useLogin";
 import { Link } from 'react-router-dom';
 
 function Login() {
-    const [email, setEmail] = useState('');
+    const [uid, setUid] = useState('');
     const [password, setPassword] = useState('');
     const [visibility, setVisibility] = useState('visibility_off');
     const [type, setType] = useState('password');
@@ -11,10 +11,10 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setEmail('');
+        setUid('');
         setPassword('');
 
-        await login(email, password);
+        await login(uid, password);
     }
 
     const handleVisibility = (e) => {
@@ -39,10 +39,10 @@ function Login() {
                         autoComplete="email"
                         id="login-email"
                         type="text"
-                        onChange={(e) => { setEmail(e.target.value) }}
-                        value={email}
+                        onChange={(e) => { setUid(e.target.value) }}
+                        value={uid}
                         required
-                        placeholder="Enter your email"
+                        placeholder="Enter your unique id (uid)"
                     />
                 </div>
                 <div className="input-box">
